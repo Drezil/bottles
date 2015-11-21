@@ -41,12 +41,16 @@ readCombos = readCombos' 1
 fillBox :: Capacity -> [Box]
 fillBox c = [(c,k) | k <- [0..c]]
 
-allCombos :: Int -> [Capacity] -> [[Box]]
+-- faster, but not that elegant.
+{-allCombos :: Int -> [Capacity] -> [[Box]]
 allCombos n c = allCombos' n c [[]]
   where
     allCombos' :: Int -> [Capacity] -> [[Box]] -> [[Box]]
     allCombos' _ [] x = x
-    allCombos' n (x:xs) l = allCombos' n xs [ a:ls  | a <- fillBox x, ls <- l, stillValidBoxes n (a:ls)]
+    allCombos' n (x:xs) l = allCombos' n xs [ a:ls  | a <- fillBox x, ls <- l, stillValidBoxes n (a:ls)]-}
+
+allCombos :: [Capacity] -> [[Box]]
+allCombos = traverse fillBox
 
 validBoxes :: Int -> [Box] -> Bool
 validBoxes n b = sum (snd <$> b) == n
@@ -55,4 +59,4 @@ stillValidBoxes :: Int -> [Box] -> Bool
 stillValidBoxes n b = sum (snd <$> b) <= n
 
 validCombos :: Int -> [Capacity] -> [[Box]]
-validCombos n c = filter (validBoxes n) $ allCombos n c
+validCombos n c = filter (validBoxes n) $ allCombos c
