@@ -2,8 +2,7 @@ module Main where
 
 {- given n bottles and k boxes with capacity c_i (i ∈ 1..l, l ∈ ℕ)
  - return the number of combinations to put the n bottles into the k
- - boxes
- - -}
+ - boxes -}
 
 import Text.Read (readMaybe)
 
@@ -17,7 +16,7 @@ main = do
         n <- readInt "How many Bottles?"
         b <- readInt "How many Boxes?"
         c <- readCombos b
-        print $ length $ validCombos n c
+        putStrLn $ "There are " ++ show (length (validCombos n c)) ++ " combinations for " ++ show n ++ " bottles in those " ++ show b ++ " boxes."
 
 readInt :: String -> IO Int
 readInt q = do
@@ -42,15 +41,18 @@ readCombos = readCombos' 1
 fillBox :: Capacity -> [Box]
 fillBox c = [(c,k) | k <- [0..c]]
 
-allCombos :: [Capacity] -> [[Box]]
-allCombos c = allCombos' c [[]]
+allCombos :: Int -> [Capacity] -> [[Box]]
+allCombos n c = allCombos' n c [[]]
   where
-    allCombos' :: [Capacity] -> [[Box]] -> [[Box]]
-    allCombos' [] x = x
-    allCombos' (x:xs) l = allCombos' xs [ a:ls  | a <- fillBox x, ls <- l]
+    allCombos' :: Int -> [Capacity] -> [[Box]] -> [[Box]]
+    allCombos' _ [] x = x
+    allCombos' n (x:xs) l = allCombos' n xs [ a:ls  | a <- fillBox x, ls <- l, stillValidBoxes n (a:ls)]
 
 validBoxes :: Int -> [Box] -> Bool
 validBoxes n b = sum (snd <$> b) == n
 
+stillValidBoxes :: Int -> [Box] -> Bool
+stillValidBoxes n b = sum (snd <$> b) <= n
+
 validCombos :: Int -> [Capacity] -> [[Box]]
-validCombos n c = filter (validBoxes n) $ allCombos c
+validCombos n c = filter (validBoxes n) $ allCombos n c
